@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pokemon Clicker Game</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <!-- LOGROS -->
+        <div class="achievements-grid hidden" id="achievements-grid">
+            <p>Achievements</p>
+            <!-- LOGRO 1 -->
+            <div id="achievement-sprite-1" class="achievement-sprite locked"></div>
+            <div id="achievement-sprite-2" class="achievement-sprite locked"></div>
+        </div>
+        <!-- MENU -->
+        <div class="variety-container">
+            <div class="achievements" id="achievements-btn"></div>
+        </div>
+        
+
+        <div class="main-container">
+            <!-- LADO IZQUIERDO -->
+            <div class="leftside">
+                <div class="pokeball centered" id="pokeball"></div>
+                <span id="treat_tag" class="score">You have 0 treat</span>
+            </div>
+            <!-- LADO DERECHO -->
+        <div class="rightside">
+            <!-- MEJORAS -->
+            <div class="upgrade-container">
+                <!-- MEJORA BASE DE CLICK 1 -->
+                <div class="upgrade to-buy" id="upgrade-click-1">
+                    <p>10</p>
+                </div>
+                <!-- MEJORA BASE DE TPS 1  -->
+                <div class="upgrade to-buy" id="upgrade-tps-1">
+                    <p>20</p>
+                </div>
+                <!-- MEJORA PORCENTUAL DE CLICK 1 -->
+                <div class="upgrade to-buy" id="upgrade-multi-click-1">
+                    <p>100</p>
+                </div>
+            </div>
+            <!-- EDIFICIOS -->
+             <!-- EDIFICIO 1 -->
+            <div class="building-container">
+
+                <div id="building-1" class="building-1 building-to-buy">
+                    <div class="building-1-progress-bar" id="progress-1" style="width: 0%;"></div>
+                </div>
+                <span id="building-1-tag" class="hp-tag">30 Treats to buy</span>
+                <hr>
+            </div>
+
+        </div>
+
+        </div>
+        
+    </body>
+    <script src="main.js"></script>
+</html>

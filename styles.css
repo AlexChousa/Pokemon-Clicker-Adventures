@@ -1,0 +1,130 @@
+.pokeball {
+    width: 300px;
+    height: 300px;
+    background-color: pink;
+    border-radius: 100%;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+/* General */
+.centered {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.fixed {
+    position: absolute;
+}
+
+.hidden {
+    display: none;
+}
+
+.locked {
+    filter: hue-rotate(180deg);
+}
+/* Divs */
+ .main-container{
+    border: 1px pink solid;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+ }
+
+ .leftside {
+    border: 1px blue solid;
+ }
+
+ .rightside {
+    border: 1px green solid;
+    width: 800px;
+ }
+.upgrade-container {
+    width: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: end;
+    border: 1px red solid;
+}
+.upgrade {
+    border: 1px solid black;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.to-buy {
+    background-color: red;
+    cursor: pointer;
+}
+
+.bought {
+    background-color: green;
+}
+
+.building-1 {
+    cursor: pointer;
+    color: white;
+    height: 120px;
+    z-index: 0;
+}
+
+.building-to-buy {
+    background-color: grey;
+    z-index: 1;
+}
+
+.building-bought {
+    background-color: blue;
+}
+
+.building-1-progress-bar {
+    height: 100%;
+    background-color: green;
+    display: block;
+    z-index: 2;
+}
+
+.hp-tag {
+    display: table;
+    margin: 0 auto;
+}
+
+.variety-container {
+    border: 1px purple solid;
+    height: 60px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.achievements {
+    background-color: blueviolet;
+    border-radius: 80%;
+    height: 100%;
+    width: 60px;
+    cursor: pointer;
+}
+
+.achievements-grid {
+    position: absolute;
+    width: 800px;
+    height: 500px;
+    background-color: deepskyblue;
+    left: 600px;
+    top: 250px;
+    
+}
+
+.achievement-sprite {
+    height: 20px;
+    width: 20px;
+    background-color: greenyellow;
+}
+
