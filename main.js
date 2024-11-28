@@ -9,8 +9,14 @@ const multiClickUpgrade1 = document.getElementById("upgrade-multi-click-1")
 
 //Declaraciones de edificios
 const building1 = document.getElementById("building-1");
+const palletTown = document.getElementById("pallet-town-img");
 const building1Tag = document.getElementById("building-1-tag");
 const progressBar1 = document.getElementById("progress-1");
+
+//Declaraciones de Helpers
+const momSprite = document.getElementById("mom-sprite");
+const momLevelTag = document.getElementById("mom-level");
+const momPriceTag = document.getElementById("mom-price");
 
 //Declaraciones menú 
 const achievementsBtn = document.getElementById("achievements-btn");
@@ -23,13 +29,12 @@ const achievement2 =  document.getElementById("achievement-sprite-2");
 //SETUP
 
 let totalTreats = 0;
-let treatsPerClick = 1;
+let treatsPerClick = 100;
 let treatsPerSecond = 0;
 let tpsMultiplier = 1;
 let tpcMultiplier = 1;
 let isAchievementsShowing = false;
 let achievementBonus = 1.00;
-
 
 //UPDATER
 
@@ -41,8 +46,10 @@ const clickUpdate = () => {
 
 const cpsUpdate = () => {
     totalTreats += calculateTPS();
+    drawPalletTownHp();
     draw();
 }
+
 setInterval(cpsUpdate, 1000);
 
 function draw() {
@@ -52,8 +59,8 @@ function draw() {
 
 //ESCALAS
 
-const priceScale = (step) => {
-
+const priceScale = (base, level) => {
+    return Math.floor(base + ((base/9)*Math.pow(level, 2)));
 }
 
 const hpScale = (base, level) => {
@@ -115,29 +122,56 @@ multiClickUpgrade1.addEventListener("click", () => {
 let building1Level = 0;
 let building1Progress = 0;
 let building1Bonus = 1;
+let helperDamage = 0;
+
+const palletTownClick = () => {
+    building1Progress += calculateTPC();
+    palletTownMaxHp()
+}
+
+const  drawPalletTownHp = () => {
+    building1Progress += helperDamage
+    palletTownMaxHp()
+}
+
+const palletTownMaxHp = () => {
+    const totalHp = hpScale(100, building1Level);
+    if (building1Progress >= totalHp) {
+        building1Level ++ 
+        building1Progress = 0
+        progressBar1.style.width = 0 + "%";
+        building1Tag.innerText = `${building1Progress} / ${hpScale(100, building1Level)} This building is level ${building1Level}`;
+        checkBuilding1Achievements();
+    } else {
+        progressBar1.style.width = (building1Progress/totalHp)*100 + "%";
+        building1Tag.innerText = `${building1Progress} / ${totalHp} This building is level ${building1Level}`;
+    }
+}
+
 building1.addEventListener("click", () => {
-    if (totalTreats >= 30 && building1.classList.contains("building-to-buy")) {
+    if (totalTreats >= 30 && palletTown.classList.contains("building-to-buy")) {
         totalTreats -= 30;
         draw();
-        building1.classList.remove("building-to-buy");
-        building1.classList.add("building-bought")
+        palletTown.classList.remove("building-to-buy");
         building1Hp = 100;
         building1Tag.innerText = `0 / 100`;
-    } else if (building1.classList.contains("building-bought")) {
-        const totalHp = hpScale(100, building1Level);
-        building1Progress += calculateTPC();
-        if (building1Progress >= totalHp) {
-            building1Level ++ 
-            building1Progress = 0
-            progressBar1.style.width = 0 + "%";
-            building1Tag.innerText = `${building1Progress} / ${hpScale(100, building1Level)} This building is level ${building1Level}`;
-            checkBuilding1Achievements();
-        } else {
-            progressBar1.style.width = (building1Progress/totalHp)*100 + "%";
-            building1Tag.innerText = `${building1Progress} / ${totalHp} This building is level ${building1Level}`;     
-        }
+    } else if (!palletTown.classList.contains("building-to-buy")) {
+        palletTownClick();
     }
     return;
+})
+//HELPERS
+let momLevel = 0;
+const baseMomPrice = 10;
+
+momSprite.addEventListener("click", () => {
+    if (totalTreats >=  priceScale(10, momLevel)) {
+        momLevel++
+        helperDamage += 1
+        console.log(helperDamage)
+        momLevelTag.innerText = `Level: ${momLevel}`
+        momPriceTag.innerText = `Price: ${priceScale(10, momLevel)} Treats`
+    }
 })
 
 //POKEBOLA
