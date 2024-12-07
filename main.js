@@ -165,12 +165,16 @@ let momLevel = 0;
 const baseMomPrice = 10;
 
 momSprite.addEventListener("click", () => {
-    if (totalTreats >=  priceScale(10, momLevel)) {
+    if (totalTreats >=  priceScale(10, momLevel) && !palletTown.classList.contains("building-to-buy")) {
+        totalTreats -= priceScale(10, momLevel)
+        draw()
         momLevel++
         helperDamage += 1
         console.log(helperDamage)
         momLevelTag.innerText = `Level: ${momLevel}`
         momPriceTag.innerText = `Price: ${priceScale(10, momLevel)} Treats`
+    } else if (palletTown.classList.contains("building-to-buy")) {
+        alert("You don't have Pallet Town unlocked")
     }
 })
 
