@@ -29,7 +29,7 @@ const achievement2 =  document.getElementById("achievement-sprite-2");
 //SETUP
 
 let totalTreats = 0;
-let treatsPerClick = 100;
+let treatsPerClick = 1;
 let treatsPerSecond = 0;
 let tpsMultiplier = 1;
 let tpcMultiplier = 1;
