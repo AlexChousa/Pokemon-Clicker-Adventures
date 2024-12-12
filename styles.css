@@ -74,7 +74,7 @@
     background-color: green;
 }
 
-.building-1 {
+.building {
     cursor: pointer;
     color: white;
     height: 120px;
@@ -85,7 +85,7 @@
     filter: grayscale(100%);
 } 
 
-.building-1-progress-bar {
+.progress-bar {
     height: 10px;
     background-color: green;
     display: block;
@@ -98,20 +98,38 @@
     margin: 1px;
 }
 
+.helper-container {
+    margin-top: 25px;
+}
+
 .helper {
     text-align: center;
 }
 
-.mom {
-    width: 50px;
+.helper-button {
+    margin-right: 0;
+    margin-left: auto;
+    display: block;
+    position: relative;
+}
+
+.hideAnimation {
+    transform: scaleY(0);    
+    transform-origin: top;
+    transition: transform 0.36s ease;
+}
+
+.showAnimation {
+    transform: scaleY(1);    
+    transform-origin: top;
+    transition: transform 0.28s ease;
+}
+
+.sprite {
+    width: 64px;
     height: 80px;
     background-color: pink;
 }
-
-
-
-
-
 
 .hp-tag {
     display: table;
