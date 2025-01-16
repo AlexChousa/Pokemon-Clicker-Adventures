@@ -8,15 +8,9 @@ const baseTpsUpgrade1 = document.getElementById("upgrade-tps-1");
 const multiClickUpgrade1 = document.getElementById("upgrade-multi-click-1")
 
 //Declaraciones de edificios
-const building1 = document.getElementById("building-1");
-const palletTown = document.getElementById("pallet-town-img");
-const building1Tag = document.getElementById("building-1-tag");
-const progressBar1 = document.getElementById("progress-1");
+const palletTown = document.getElementById("palletTown");
 
-const route1 = document.getElementById("route-1");
-const route1Img = document.getElementById("route-1-img");
-const route1Tag = document.getElementById("route-1-tag");
-const route1ProgressBar = document.getElementById("route-1-progress");
+const route1 = document.getElementById("route1")
 
 //Declaraciones de Helpers
 const momSprite = document.getElementById("mom-sprite");
@@ -54,7 +48,6 @@ const clickUpdate = () => {
 
 const cpsUpdate = () => {
     totalTreats += calculateTPS();
-    drawPalletTownHp();
     draw();
 }
 
@@ -85,13 +78,19 @@ const calculateTPC = () => {
 
     //ESCALAS POR EDIFICIO
     const buildingsTPS = () => {
-        return building1TPS() + route1TPS();
+        return townTPS() + routeTPS();
     }
-    const building1TPS = () => {
-        return 1*building1Level*building1Bonus;
+    const townTPS = () => {
+        let tps = Object.values(townData).reduce((sum, town) =>{
+            return town.bought ? sum + (town.baseTPS * town.bonusTps * town.level || 0) : sum
+        }, 0) 
+        return tps
     }
-    const route1TPS = () => {
-        return 2*route1Level*route1Bonus;
+    const routeTPS = () => {
+        let tps = Object.values(routeData).reduce((sum, route) =>{
+            return route.bought ? sum + (route.baseTPS * route.bonusTps * route.level || 0) : sum
+        }, 0) 
+        return tps
     }
 
 //UPGRADES
@@ -131,80 +130,108 @@ multiClickUpgrade1.addEventListener("click", () => {
 //Edificios
 let helperDamage = 0;
 
-//Pallet Town
-let building1Level = 0;
-let building1Progress = 0;
-let building1Bonus = 1;
+let townData = {
+    palletTown: {
+        name: "palletTown",
+        level: 0,
+        progress: 0,
+        bonusTps: 1,
+        baseHp: 100,
+        basePrice: 30, 
+        bought: false,
+        baseTPS: 1,
+    }
+}
 
-const palletTownClick = () => {
-    building1Progress += calculateTPC();
-    palletTownMaxHp()
-}
-const  drawPalletTownHp = () => {
-    building1Progress += helperDamage
-    palletTownMaxHp()
-}
-const palletTownMaxHp = () => {
-    const totalHp = hpScale(100, (building1Level - 1));
-    if (building1Progress >= totalHp) {
-        building1Level ++ 
-        building1Progress = 0
-        progressBar1.style.width = 0 + "%";
-        building1Tag.innerText = `${building1Progress} / ${hpScale(100, building1Level)} Town is level ${building1Level}`;
-        checkBuilding1Achievements();
-    } else if (!palletTown.classList.contains("building-to-buy")){
-        progressBar1.style.width = (building1Progress/totalHp)*100 + "%";
-        building1Tag.innerText = `${building1Progress} / ${totalHp} Town is level ${building1Level}`;
-    }
-}
-building1.addEventListener("click", () => {
-    if (totalTreats >= 30 && palletTown.classList.contains("building-to-buy")) {
-        totalTreats -= 30;
-        draw();
-        palletTown.classList.remove("building-to-buy");
-        building1Tag.innerText = `0 / 100 Town is level ${building1Level}`;
-        building1Level = 1
-    } else if (!palletTown.classList.contains("building-to-buy")) {
-        palletTownClick();
-    }
-    return;
+palletTown.addEventListener("click", () => {
+    townClick(townData.palletTown)
 })
 
-//Route 1
+const townClick = (obj) => {
+    const imgElement = obj.name + "Img"
+    const img = document.getElementById(imgElement);
 
-let route1Level = 0;
-let route1Progress = 0;
-let route1Bonus = 1;
+    const tagElement = obj.name + "Tag"
+    const tag = document.getElementById(tagElement);
+
+    const prgressElement = obj.name + "Progress"
+    const progressBar = document.getElementById(prgressElement);
+
+    if(totalTreats >= obj.basePrice && obj.bought === false) {
+        totalTreats -= obj.basePrice;
+        draw(); 
+        obj.bought = true
+        obj.level = 1
+        img.classList.remove("building-to-buy")
+        tag.innerText = `0 / ${obj.baseHp} Town is level ${obj.level}`;
+    }
+    obj.progress += calculateTPC()
+ 
+    const totalHp = hpScale(obj.baseHp, (obj.level - 1))
+    if (obj.progress >= totalHp){
+        obj.level += 1
+        obj.progress = 0
+        progressBar.style.width = 0 + "%"
+        tag.innerText = `${obj.progress} / ${hpScale(obj.baseHp, (obj.level - 1))} Town is level ${obj.level}`
+        checkAchievements();
+    } else if (obj.bought === true) {
+        progressBar.style.width = (obj.progress / totalHp) * 100 + "%"
+        tag.innerText = `${obj.progress} / ${totalHp} Town is level ${obj.level}`
+    }
+}
+//RUTAS
+let routeData = {
+    route1: {
+        name: "route1",
+        level: 0,
+        progress: 0,
+        bonusTps: 1,
+        baseHp: 300,
+        basePrice: 100,
+        bought: false,
+        baseTPS: 2,
+        catchPKMN: [16, 19]
+    }
+}
 
 route1.addEventListener("click", () => {
-    if (totalTreats >= 100 && route1Img.classList.contains("building-to-buy")) {
-        totalTreats -= 100;
-        draw(); 
-        route1Img.classList.remove("building-to-buy");
-        route1Tag.innerText = `0 / 300 Route is level ${route1Level}`;
-        route1Level = 1
-    } else if (!route1Img.classList.contains("building-to-buy")) {
-        route1Click()
-    }
+    routeClick(routeData.route1);
 })
 
-const route1Click = () => {
-    route1Progress += calculateTPC();
-    route1MaxHp()
-}
+const routeClick = (obj) => {
+    const imgElement = obj.name + "Img"
+    const img = document.getElementById(imgElement)
 
-const route1MaxHp = () => {
-    const totalHp = hpScale(300, (route1Level - 1));
-    if (route1Progress >= totalHp) {
-        route1Level ++ 
-        route1Progress = 0
-        route1ProgressBar.style.width = 0 + "%";
-        route1Tag.innerText = `${route1Progress} / ${hpScale(100, route1Level)} Route is level ${route1Level}`;
-        checkAchievements();
-    } else if (!route1Img.classList.contains("building-to-buy")){
-        route1ProgressBar.style.width = (route1Progress/totalHp)*100 + "%";
-        route1Tag.innerText = `${route1Progress} / ${totalHp} Route is level ${route1Level}`;
+    const tagElement = obj.name + "Tag"
+    const tag = document.getElementById(tagElement)
+
+    const progressElement = obj.name + "Progress"
+    const progressBar = document.getElementById(progressElement)
+
+
+    if(totalTreats >= obj.basePrice && obj.bought === false) {
+        totalTreats -= obj.basePrice;
+        draw(); 
+        obj.bought = true
+        obj.level = 1
+        img.classList.remove("building-to-buy")
+        tag.innerText = `0 / ${obj.baseHp} Route is level ${obj.level}`;
     }
+    obj.progress += calculateTPC()
+ 
+    const totalHp = hpScale(obj.baseHp, (obj.level - 1))
+    if (obj.progress >= totalHp){
+        obj.level += 1
+        obj.progress = 0
+        progressBar.style.width = 0 + "%"
+        tag.innerText = `${obj.progress} / ${hpScale(obj.baseHp, (obj.level - 1))} Route is level ${obj.level}`
+        checkAchievements();
+    } else if (obj.bought === true) {
+        progressBar.style.width = (obj.progress / totalHp) * 100 + "%"
+        tag.innerText = `${obj.progress} / ${totalHp} Route is level ${obj.level}`
+    }
+
+
 }
 
 //HELPERS
@@ -271,7 +298,10 @@ palletTownBtn.addEventListener("click", () => {
             document.getElementById("pallet-town-helpers").classList.remove("hideAnimation")
         }, 20)
         
-        document.getElementById("pallet-town-helpers").classList.add("flex-center")
+        document.getElementById("pallet-town-helpers").classList.add("flex-center") 
         document.getElementById("pallet-town-helpers").classList.remove("hidden")
     }
 })
+
+// Catch pokemon
+
