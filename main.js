@@ -13,9 +13,9 @@ const palletTown = document.getElementById("palletTown");
 const route1 = document.getElementById("route1")
 
 //Declaraciones de Helpers
-const momSprite = document.getElementById("mom-sprite");
-const momLevelTag = document.getElementById("mom-level");
-const momPriceTag = document.getElementById("mom-price");
+const momSprite = document.getElementById("momSprite")
+const momLevelTag = document.getElementById("momLevel");
+const momPriceTag = document.getElementById("momPrice");
 
 //Declaraciones menú 
 const achievementsBtn = document.getElementById("achievements-btn");
@@ -48,14 +48,19 @@ const clickUpdate = () => {
 
 const cpsUpdate = () => {
     totalTreats += calculateTPS();
+    helperDamage()
     draw();
 }
-
+ 
 setInterval(cpsUpdate, 1000);
 
 function draw() {
     scoreTag.innerText = `You have ${totalTreats} treats.`;
     return;
+}
+
+const helperDamage = () => {
+    calculateTotalDamage("palletTown")
 }
 
 //ESCALAS
@@ -128,8 +133,6 @@ multiClickUpgrade1.addEventListener("click", () => {
     return;
 })
 //Edificios
-let helperDamage = 0;
-
 let townData = {
     palletTown: {
         name: "palletTown",
@@ -140,6 +143,24 @@ let townData = {
         basePrice: 30, 
         bought: false,
         baseTPS: 1,
+        helpers: {
+            mom: {
+                name: "mom",
+                level: 0,
+                basePrice: 10,
+                baseDamage: 1,
+                hired: false,
+                unlocked: true,
+            },
+            blue: {
+                name: "blue",
+                level: 0,
+                basePrice: 1000,
+                baseDamage: 100,
+                hired: false,
+                unlocked: true,
+            }
+        }
     }
 }
 
@@ -235,23 +256,62 @@ const routeClick = (obj) => {
 }
 
 //HELPERS
+
 let momLevel = 0;
 const baseMomPrice = 10;
 
-    //Pallet Town Helpers
-momSprite.addEventListener("click", () => {
-    if (totalTreats >=  priceScale(10, momLevel) && !palletTown.classList.contains("building-to-buy")) {
-        totalTreats -= priceScale(10, momLevel)
-        draw()
-        momLevel++
-        helperDamage += 1
-        console.log(helperDamage)
-        momLevelTag.innerText = `Level: ${momLevel}`
-        momPriceTag.innerText = `Price: ${priceScale(10, momLevel)} Treats`
-    } else if (palletTown.classList.contains("building-to-buy")) {
-        alert("You don't have Pallet Town unlocked")
+    momSprite.addEventListener("click", () => {
+        helperClick(townData.palletTown.helpers.mom)
+    })
+
+    const helperClick = (obj) => {
+        const imgElement = obj.name + "Img"
+        const img = document.getElementById(imgElement)
+
+        const levelElement = obj.name + "Level"
+        const levelTag = document.getElementById(levelElement)
+
+        const priceElement = obj.name + "Price"
+        const priceTag = document.getElementById(priceElement)
+
+        const marker = "townData." + obj.town + ".bought"
+        console.log(marker)
+
+        if (totalTreats >= obj.basePrice && obj.hired === false && obj.unlocked === true) {
+            totalTreats -= obj.basePrice
+            draw()
+            obj.hired = true 
+            obj.level = 1
+            img.classList.remove("building-to-buy")
+            levelTag.innerText = `Level: ${obj.level}`
+            priceTag.innerText = `Price ${priceScale(obj.basePrice, obj.level)} Treats`
+        } else if (obj.unlocked === false) {
+            alert("The helper seems not interested in working for you")
+        } else if (obj.unlocked === true && totalTreats < obj.basePrice){
+            alert("You don't have enough treats to hire this helper")
+        } else if (totalTreats >= priceScale(obj.basePrice, obj.level) && obj.hired === true) {
+            totalTreats -= priceScale(obj.basePrice, obj.level)
+            obj.level += 1
+            levelTag.innerText = `Level: ${obj.level}`
+            priceTag.innerText = `Price ${priceScale(obj.basePrice, obj.level)} Treats`
+        }
     }
-})
+
+    const calculateTotalDamage = (town) => {
+        const helpers = townData[town].helpers;
+        let totalDamage = 0;
+        Object.keys(helpers).forEach(helperKey => {
+            const helper = helpers[helperKey];
+            totalDamage += helper.baseDamage * helper.level;
+        });
+        townData[town].progress += totalDamage
+        if (townData[town].progress >= hpScale(townData[town].baseHp, townData[town].level)) {
+            townData[town].level ++
+            townData[town].progress = 0
+        }
+        document.getElementById(`${townData[town].name}Progress`).style.width = (townData[town].progress / hpScale(townData[town].baseHp, townData[town].level)) * 100 + "%"
+        document.getElementById(`${townData[town].name}Tag`).innerText= `${townData[town].progress} / ${hpScale(townData[town].baseHp, townData[town].level)} Town is level ${townData[town].level}`
+    };
 
 //POKEBOLA
 
