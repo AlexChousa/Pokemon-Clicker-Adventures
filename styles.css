@@ -38,16 +38,18 @@
     height: 100%;
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
  }
 
  .leftside {
     border: 1px blue solid;
+    margin: 30px;
  }
 
  .rightside {
     border: 1px green solid;
     width: 800px;
+    margin: 30px;
  }
 .upgrade-container {
     width: 100%;
@@ -100,6 +102,7 @@
 
 .helper-container {
     margin-top: 25px;
+    z-index: 1;
 }
 
 .helper {
@@ -159,7 +162,8 @@
     height: 500px;
     background-color: deepskyblue;
     left: 600px;
-    top: 250px;
+    top: 200px;
+    z-index: 10;
     
 }
 
@@ -169,3 +173,57 @@
     background-color: greenyellow;
 }
 
+/* NOTIFICACIONES */
+.trophy-window {
+    position: relative;
+    margin: 10px;
+    border: 2px rgba(0, 0, 0, 0.253) solid;
+    border-radius: 7%;
+    width: 350px;
+    opacity: 0%;
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: rgb(230, 230, 230);
+    animation-name: notificacion;
+    animation-duration: 7s
+}
+
+.trophy {
+    border-radius: 7%;
+    width: 350px;
+    height: 100%;
+    top: 80px;
+    right: 0;
+    position: absolute;
+    margin: 4px;
+    
+}
+
+@keyframes notificacion {
+    0% {opacity: 0%; top: -100px}
+    25% {opacity: 100%; top: 0px;}
+    75%{opacity: 100%; top: 0px;}
+    100%{opacity: 0%; top: 70px}
+}
+.trophy-img {
+    height: 80px;
+    border-radius: 15%;
+}
+
+.trophy-img-div {
+    width: auto;
+    border: 1px rgba(0, 0, 0, 0.35) solid;
+    border-radius: 15%;
+}
+
+.trophy-title {
+    margin:5px;
+    font-size: 24px;
+}
+
+.trophy-text {
+    margin: 5px;
+    font-size: 16px;
+}

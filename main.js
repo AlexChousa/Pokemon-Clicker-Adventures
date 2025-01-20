@@ -1,6 +1,7 @@
 //Declaraciones generales
 const pokeball = document.getElementById("pokeball");
 const scoreTag = document.getElementById("treat_tag");
+const notificationDiv = document.getElementById("trophyNotification")
 
 //Declaraciones de mejoras
 const baseClickUpgrade1 = document.getElementById("upgrade-click-1");
@@ -22,21 +23,32 @@ const achievementsBtn = document.getElementById("achievements-btn");
 const achievementsGrid = document.getElementById("achievements-grid");
 
 //Declaraciones logros
+const achievement0 =  document.getElementById("achievement-sprite-0");
 const achievement1 =  document.getElementById("achievement-sprite-1");
-const achievement2 =  document.getElementById("achievement-sprite-2");
 
 //Declaraciones botones
 const palletTownBtn = document.getElementById("pallet-town-button");
 
 //SETUP
 
-let totalTreats = 0;
-let treatsPerClick = 100;
-let treatsPerSecond = 0;
-let tpsMultiplier = 1;
-let tpcMultiplier = 1;
+let playerData = {
+    treats: 0,
+    tpc: 100,
+    tps: 0,
+    tpsX: 1,
+    tpcX: 1,
+    bonusAchievment: 1.00,
+}
+
+let totalTreats = playerData.treats
+let treatsPerClick = playerData.tpc
+let treatsPerSecond = playerData.tps
+let tpsMultiplier = playerData.tpsX
+let tpcMultiplier = playerData.tpcX
 let isAchievementsShowing = false;
-let achievementBonus = 1.00;
+let achievementBonus = playerData.bonusAchievment
+
+
 
 //UPDATER
 
@@ -60,7 +72,7 @@ function draw() {
 }
 
 const helperDamage = () => {
-    calculateTotalDamage("palletTown")
+    checkHiredHelpers("palletTown")
 }
 
 //ESCALAS
@@ -97,6 +109,8 @@ const calculateTPC = () => {
         }, 0) 
         return tps
     }
+
+
 
 //UPGRADES
 //BASE CLICK 1
@@ -160,7 +174,32 @@ let townData = {
                 hired: false,
                 unlocked: true,
             }
-        }
+        },
+        trophyCount: 0,
+        trophies: [
+            // ACHIEVEMENT 0
+            {
+            name: "Getting Started",
+            text: "You've got your first township",
+            quantity: 1,
+            id: 0,
+            bonus: 0.05,
+            step: 0,
+            unlocked: false,
+            imgLink: "Resources/TrophyIcons/PalletTown/palletTownTrophy1.png"
+            },
+            // ACHIEVEMENT 1
+            {
+            name: "Pallet Town Visitor",
+            text: "Raise Pallet Town's level to 10",
+            quantity: 10,
+            id: 1,
+            bonus: 0.05,
+            step: 1,
+            unlocked: false,
+            imgLink: "Resources/TrophyIcons/PalletTown/palletTownTrophy1.png"
+            },
+        ]
     }
 }
 
@@ -185,16 +224,18 @@ const townClick = (obj) => {
         obj.level = 1
         img.classList.remove("building-to-buy")
         tag.innerText = `0 / ${obj.baseHp} Town is level ${obj.level}`;
+        checkAchievements(obj.name)
+        return
     }
     obj.progress += calculateTPC()
  
     const totalHp = hpScale(obj.baseHp, (obj.level - 1))
-    if (obj.progress >= totalHp){
+    if (obj.progress >= totalHp && obj.bought === true){
         obj.level += 1
         obj.progress = 0
         progressBar.style.width = 0 + "%"
         tag.innerText = `${obj.progress} / ${hpScale(obj.baseHp, (obj.level - 1))} Town is level ${obj.level}`
-        checkAchievements();
+        checkAchievements(obj.name);
     } else if (obj.bought === true) {
         progressBar.style.width = (obj.progress / totalHp) * 100 + "%"
         tag.innerText = `${obj.progress} / ${totalHp} Town is level ${obj.level}`
@@ -229,19 +270,19 @@ const routeClick = (obj) => {
     const progressElement = obj.name + "Progress"
     const progressBar = document.getElementById(progressElement)
 
-
     if(totalTreats >= obj.basePrice && obj.bought === false) {
         totalTreats -= obj.basePrice;
         draw(); 
         obj.bought = true
         obj.level = 1
         img.classList.remove("building-to-buy")
-        tag.innerText = `0 / ${obj.baseHp} Route is level ${obj.level}`;
+        tag.innerText = `0 / ${obj.baseHp} Route is level ${obj.level}`
+        return
     }
     obj.progress += calculateTPC()
  
     const totalHp = hpScale(obj.baseHp, (obj.level - 1))
-    if (obj.progress >= totalHp){
+    if (obj.progress >= totalHp && obj.bought === true){
         obj.level += 1
         obj.progress = 0
         progressBar.style.width = 0 + "%"
@@ -256,9 +297,6 @@ const routeClick = (obj) => {
 }
 
 //HELPERS
-
-let momLevel = 0;
-const baseMomPrice = 10;
 
     momSprite.addEventListener("click", () => {
         helperClick(townData.palletTown.helpers.mom)
@@ -297,6 +335,14 @@ const baseMomPrice = 10;
         }
     }
 
+    const checkHiredHelpers = (town) => {
+        const helpers = townData[town].helpers;
+        for (const helperName of Object.keys(helpers)) {
+            if (helpers[helperName].hired) {calculateTotalDamage(town)}
+        }
+        return
+    }
+
     const calculateTotalDamage = (town) => {
         const helpers = townData[town].helpers;
         let totalDamage = 0;
@@ -330,17 +376,29 @@ achievementsBtn.addEventListener("click", () => {
 })
 
 //LOGROS
+const checkAchievements = (str) => {
+    if (townData[str].trophies[townData[str].trophyCount].quantity === townData[str].level) {
+        townData[str].trophies[townData[str].unlocked] = true
+        showNotification(townData[str].trophies[townData[str].trophyCount])
+        townData[str].trophyCount ++
+    }
+}
 
-const checkAchievements = () => {
-    if(building1Level === 1) {
-        achievement1.classList.remove("locked");
-        achievementBonus += 0.05;
-    };
-    if(building1Level === 10) {
-        achievement2.classList.remove("locked");
-        achievementBonus += 0.07;
-    };
-};
+  const showNotification = async (obj) => {
+    console.log(`src="${obj.imgLink}`)
+    notificationDiv.innerHTML += `
+    <div class="trophy-window">
+        <div class="trophy-img-div"><img class="trophy-img" src="${obj.imgLink}"></div>
+            <div>
+                <h2 class="trophy-title">${obj.name}</h2>
+                <p class="trophy-text">${obj.text}</p>
+            </div>
+    </div>
+    `
+    setTimeout(() => {
+        notificationDiv.innerHTML = "" 
+    }, 10000)
+}
 
 //Botones 
 
